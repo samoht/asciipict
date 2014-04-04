@@ -21,13 +21,13 @@ let set_char_array char_subset =
 
 let rec input_int in_chan =
   let c = input_char in_chan in
-  if c = ' ' or c = '\n' then
+  if c = ' ' || c = '\n' then
     input_int in_chan
   else read (int_of_char c - 48) in_chan
 
 and read i in_chan =
   let c = input_char in_chan in
-  if c = ' ' or c = '\n' then i
+  if c = ' ' || c = '\n' then i
   else
     read (10*i + (int_of_char c - 48)) in_chan
 
@@ -150,10 +150,10 @@ let blit_matrix ~posx ~lenx ~posy ~leny mat =
 let diff mat1 mat2 =
   let dimx = Array.length mat1
   and dimx' = Array.length mat2 in
-  if dimx = 0 or dimx <> dimx' then invalid_arg "diff";
+  if dimx = 0 || dimx <> dimx' then invalid_arg "diff";
   let dimy = Array.length mat1.(0)
   and dimy' = Array.length mat2.(0) in
-  if dimy = 0 or dimy <> dimy' then invalid_arg "diff";
+  if dimy = 0 || dimy <> dimy' then invalid_arg "diff";
 
   let sum = ref 0 in
   for i = 0 to dimx-1 do
