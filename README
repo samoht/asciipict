@@ -1,0 +1,34 @@
+ASCIIpict is a program to generate ASCII pictures from PBM or PGM
+pictures. PBM is the black and white variant of the PNM format 
+while PGM is grayscale PNM.
+Using the PGM format leads more uniform pictures than with the PBM
+format. Preprocess your picture so that it is well-contrasted, not to
+bright and not too dark.
+
+
+REQUIREMENTS:
+
+Compilation requires Objective Caml 3.0, see http://caml.inria.fr
+
+
+INSTALLATION:
+
+From the source directory, type:
+  make
+
+If it doesn't work, then try with the bytecode compiler by typing:
+  make byte-code
+
+Copy the executable named 'asciipict' where you want.
+To saved disk space, type:
+  make clean
+
+If you want it to run a bit faster, you may try:
+  make OCAMLFLAGS=-unsafe
+instead of 'make'.
+
+
+NOTES:
+
+Compilation with ocamlopt produces native code which is here 
+about 13 times faster than the bytecode produced by ocamlc.
