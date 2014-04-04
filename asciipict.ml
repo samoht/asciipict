@@ -34,7 +34,7 @@ and read i in_chan =
 
 type buf = { mutable n : int;
 	     mutable ar : int array }
-let buf = { n = -1; 
+let buf = { n = -1;
 	    ar = Array.make 8 0 }
 let reset_buf () = buf.n <- -1
 let input_bit in_chan =
@@ -54,7 +54,7 @@ let input_bit in_chan =
   buf.n <- n - 1;
   i
 
-    
+
 
 let read_color_pbm in_chan =
   255*(1-(input_int in_chan))
@@ -96,15 +96,15 @@ let rec skip_comments in_chan =
 let parse_dim s =
   let re = Str.regexp "\\([0-9]+\\)[ ]+\\([0-9]+\\)" in
   if Str.string_match re s 0 then
-    (int_of_string (Str.matched_group 1 s), 
+    (int_of_string (Str.matched_group 1 s),
      int_of_string (Str.matched_group 2 s))
   else failwith "incorrect syntax for the dimensions"
 
-   
+
 let read_file ?(scale=1) ?(color_scale=1.0) in_chan =
   let filetype = check_first_line in_chan in
   let dim_line = skip_comments in_chan in
-  let (dimx1,dimy1) = parse_dim dim_line in 
+  let (dimx1,dimy1) = parse_dim dim_line in
 
   let read_color =
     match filetype with
@@ -112,7 +112,7 @@ let read_file ?(scale=1) ?(color_scale=1.0) in_chan =
       | `PGM -> check_colors_255 in_chan; read_color_pgm
       | `PBM_raw -> read_color_pbm_raw
       | `PGM_raw -> check_colors_255 in_chan; read_color_pgm_raw in
- 
+
   let dimx = scale*dimx1 and dimy = scale*dimy1 in
   if dimx = 0 || dimy = 0 then exit 0;
 
@@ -121,8 +121,8 @@ let read_file ?(scale=1) ?(color_scale=1.0) in_chan =
     reset_buf (); (* alignment (raw PBM only) *)
     for j = 0 to dimx1-1 do
       let native_color = read_color in_chan in
-      let color = 255 - 
-		  (int_of_float 
+      let color = 255 -
+		  (int_of_float
 		     (color_scale *. (float (255 - native_color)))) in
       for shiftx = 0 to scale-1 do
 	let row = mat.(scale*i+shiftx) in
@@ -148,7 +148,7 @@ let blit_matrix ~posx ~lenx ~posy ~leny mat =
   sub
 
 let diff mat1 mat2 =
-  let dimx = Array.length mat1 
+  let dimx = Array.length mat1
   and dimx' = Array.length mat2 in
   if dimx = 0 or dimx <> dimx' then invalid_arg "diff";
   let dimy = Array.length mat1.(0)
@@ -168,7 +168,7 @@ let best_diff mat_array mat =
   let init = ((!char_rows * !char_cols * 255),32) in
   let (lower_diff, char_num) =
     Array.fold_left (fun ((d_accu,_) as accu) ((i,mat')) ->
-		       let d = diff mat' mat in 
+		       let d = diff mat' mat in
 		       if d < d_accu then (d,i)
 		       else accu) init mat_array in
   (*eprintf "best_diff=%i\n" lower_diff;*)
@@ -184,8 +184,8 @@ let char_map mat =
   let splitted_mat = Array.make_matrix dimx_mini dimy_mini ' ' in
   for i = 0 to dimx_mini-1 do
     for j = 0 to dimy_mini-1 do
-      let sub_mat = blit_matrix 
-		    ~posx:(i * !char_rows) 
+      let sub_mat = blit_matrix
+		    ~posx:(i * !char_rows)
 		    ~lenx:!char_rows
 		    ~posy:(j * !char_cols)
 		    ~leny:!char_cols
@@ -206,9 +206,9 @@ let print_html line =
   print_string "\n"
 
 let print_map ~negative ~html map =
-  if html then 
-    (let (bg,fg) = 
-       if negative then ("black","white") 
+  if html then
+    (let (bg,fg) =
+       if negative then ("black","white")
        else ("white","black") in
      printf "<html>
 <body bgcolor=%s>
@@ -220,11 +220,11 @@ let print_map ~negative ~html map =
 </body>
 </html>
 ")
-  else 
+  else
     Array.iter (fun ar -> Array.iter print_char ar; print_newline ()) map
-  
 
-let run ~negative ~verbose ~scale ~color_scale ~html in_chan = 
+
+let run ~negative ~verbose ~scale ~color_scale ~html in_chan =
   let img = read_file ~scale ~color_scale in_chan in
   let img' = if negative then neg img else img in
   let map = char_map img' in
@@ -236,7 +236,7 @@ let run ~negative ~verbose ~scale ~color_scale ~html in_chan =
 
 open Arg
 
-let errmsg = Printf.sprintf 
+let errmsg = Printf.sprintf
 		"Usage: asciipict [options] [input file]
 This program produces an ASCII representation of an image.
 Images must be in PBM or PGM formats (variants of the PNM format).
@@ -256,19 +256,19 @@ let rec options = [
   "         reverse video";
 
   "-scale",
-  Int (fun i -> 
-	 if i > 0 then scale := i 
+  Int (fun i ->
+	 if i > 0 then scale := i
 	 else (usage options errmsg; exit 1)),
   "<factor>    factor must be a strictly positive integer";
 
   "-brighter",
-  Float (fun f -> 
+  Float (fun f ->
 	 if f >= 0.0 && f <= 1.0 then brighter := f
 	 else (usage options errmsg; exit 1)),
   "<num>    num must be a positive number lower or equal to 1.0";
 
   "-font",
-  String (fun s -> font := s; 
+  String (fun s -> font := s;
 	    let config = Config.run ~font:s in
 	    char_cols := config.Config.dimx;
 	    char_rows := config.Config.dimy;
@@ -300,14 +300,14 @@ let _ =
 
   let color_scale = 1.0 -. !brighter in
 
-  if !files = [] then 
-    run ~negative:!negative ~verbose:!verbose ~scale:!scale ~color_scale 
+  if !files = [] then
+    run ~negative:!negative ~verbose:!verbose ~scale:!scale ~color_scale
     ~html:!html stdin
-  else 
-    List.iter (fun file -> run 
+  else
+    List.iter (fun file -> run
 		 ~negative:!negative
-		 ~verbose:!verbose 
-		 ~scale:!scale 
-		 ~color_scale 
+		 ~verbose:!verbose
+		 ~scale:!scale
+		 ~color_scale
 		 ~html:!html
 		 (open_in file)) !files
